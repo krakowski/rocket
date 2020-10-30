@@ -2,7 +2,7 @@ This is a small application designed for sending notifications to RocketChat. It
 
 ## :wrench: &nbsp; Installation
 
-The binary is available for Linux, macOS and Windows from the [GitHub Releases page](https://github.com/krakowski/rocket).
+The binary is available for Linux, macOS and Windows from the [GitHub Releases page](https://github.com/krakowski/rocket/releases).
 
 ## :bulb: &nbsp; Example
 

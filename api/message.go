@@ -35,4 +35,11 @@ type AttachmentField struct {
 type MessageResponse struct {
 	Channel string	`json:"channel"`
 	Success	bool `json:"success"`
+	Error	string `json:"error"`
+}
+
+type MessageError struct {
+	Success bool `json:"success"`
+	Error string `json:"error"`
+	ErrorType string `json:"errorType"`
 }

@@ -1,6 +1,8 @@
 package rocket
 
-import "errors"
+import (
+	"fmt"
+)
 
 const (
 	postMessagePath = "api/v1/chat.postMessage"
@@ -8,14 +10,16 @@ const (
 
 func (message *MessageService) Post(payload MessagePayload) (*MessageResponse, error) {
 
+	var msgError MessageError
 	var response MessageResponse
 	_, err := message.resty.R().
 		SetBody(payload).
+		SetError(&msgError).
 		SetResult(&response).
 		Post(postMessagePath)
 
 	if !response.Success {
-		return nil, errors.New("Posting message failed")
+		return nil, fmt.Errorf("Posting message to channel %s failed (%s)", payload.Channel, msgError.Error)
 	}
 
 	return &response, err

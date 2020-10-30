@@ -1,0 +1,35 @@
+language: go
+
+go: "1.14"
+
+env:
+  global:
+    - LINUX_BINARY=release/rocket-${TRAVIS_TAG}-linux-amd64
+    - DARWIN_BINARY=release/rocket-${TRAVIS_TAG}-darwin-amd64
+    - WINDOWS_BINARY=release/rocket-${TRAVIS_TAG}-windows-amd64.exe
+
+before_script:
+  - "GOOS=linux go get"
+  - "GOOS=darwin go get"
+  - "GOOS=windows go get"
+
+script:
+  - go test
+
+before_deploy:
+  - mkdir -p release
+  - "GOOS=linux  GOARCH=amd64 go build -o ${LINUX_BINARY}"
+  - "GOOS=darwin GOARCH=amd64 go build -o ${DARWIN_BINARY}"
+  - "GOOS=windows GOARCH=amd64 go build -o ${WINDOWS_BINARY}"
+
+deploy:
+  provider: releases
+  api_key: ${API_KEY}
+  skip_cleanup: true
+  file:
+    - "${LINUX_BINARY}"
+    - "${DARWIN_BINARY}"
+    - "${WINDOWS_BINARY}"
+  on:
+    repo: krakowski/rocket
+    tags: true

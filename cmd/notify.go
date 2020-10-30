@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	rocket "github.com/krakowski/rocket/api"
 	"github.com/krakowski/rocket/util"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -32,37 +32,60 @@ var notifyCommand = &cobra.Command{
 	Args:          cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
+		spin := util.StartSpinner("Parsing template file")
+
 		// Parse the template file
 		tmpl, err := template.ParseFiles(path.Join(directory, args[0]+".yml"))
 		if err != nil {
-			log.Fatal(err)
+			spin.StopError(err)
+			os.Exit(1)
 		}
 
 		// Read environment variables
 		values, err := createTemplateValues()
 		if err != nil {
-			log.Fatal(err)
+			spin.StopError(err)
+			os.Exit(1)
 		}
 
 		// Execute the template
 		var out bytes.Buffer
 		if err = tmpl.Execute(&out, values); err != nil {
-			log.Fatal(err)
+			spin.StopError(err)
+			os.Exit(1)
 		}
 
 		// Decode the yaml output
 		var payload rocket.MessagePayload
 		if err = yaml.NewDecoder(bytes.NewReader(out.Bytes())).Decode(&payload); err != nil {
-			log.Fatal(err)
+			spin.StopError(err)
+			os.Exit(1)
 		}
 
+		spin.StopSuccess(util.NoMessage)
+
+		spin = util.StartSpinner("Authenticating with RocketChat")
+
 		// Create a new RocketChat client
-		client := util.NewRocketClient()
+		client, err := util.NewRocketClient()
+		if err != nil {
+			spin.StopError(err)
+			fmt.Printf(" - %s\n", rocket.LastError.Message)
+			os.Exit(1)
+		}
+
+		spin.StopSuccess(util.NoMessage)
+
+		spin = util.StartSpinner("Sending notification to channel " + payload.Channel)
 
 		// Post the message
 		if err = client.Message.Post(payload); err != nil {
-			log.Fatal(err)
+			spin.StopError(err)
+			fmt.Printf(" - %s\n", rocket.LastError.Message)
+			os.Exit(1)
 		}
+
+		spin.StopSuccess(util.NoMessage)
 	},
 }
 

@@ -38,6 +38,7 @@ func NewClient(client *http.Client, options ClientOptions) (*Client, error) {
 	}
 
 	// Configure the created resty client
+	restyClient.SetError(&LastError)
 	restyClient.SetHostURL(options.ServerUrl)
 	restyClient.SetHeaders(map[string]string{
 		"Accept":       "application/json",

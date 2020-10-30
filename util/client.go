@@ -1,8 +1,8 @@
 package util
 
 import (
+	"fmt"
 	rocket "github.com/krakowski/rocket/api"
-	"log"
 	"os"
 )
 
@@ -10,10 +10,10 @@ const (
 	envHost = "ROCKET_HOST"
 )
 
-func NewRocketClient() (*rocket.Client) {
+func NewRocketClient() (*rocket.Client, error) {
 	serverUrl, present := os.LookupEnv(envHost)
 	if !present {
-		log.Fatal("Please specify the RocketChat server url in the ROCKET_HOST environment variable")
+		return nil, fmt.Errorf("ROCKET_HOST environment variable missing")
 	}
 
 	credentials := GetCredentials()
@@ -23,8 +23,8 @@ func NewRocketClient() (*rocket.Client) {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return client
+	return client, nil
 }

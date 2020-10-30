@@ -62,7 +62,7 @@ var notifyCommand = &cobra.Command{
 			os.Exit(1)
 		}
 
-		spin.StopSuccess(util.NoMessage)
+		spin.StopSuccess("Success")
 
 		spin = util.StartSpinner("Authenticating with RocketChat")
 
@@ -74,18 +74,19 @@ var notifyCommand = &cobra.Command{
 			os.Exit(1)
 		}
 
-		spin.StopSuccess(util.NoMessage)
+		spin.StopSuccess("Logged in as " + client.CurrentUser)
 
-		spin = util.StartSpinner("Sending notification to channel " + payload.Channel)
+		spin = util.StartSpinner("Sending notification")
 
 		// Post the message
-		if err = client.Message.Post(payload); err != nil {
+		resp, err := client.Message.Post(payload)
+		if err != nil {
 			spin.StopError(err)
 			fmt.Printf(" - %s\n", rocket.LastError.Message)
 			os.Exit(1)
 		}
 
-		spin.StopSuccess(util.NoMessage)
+		spin.StopSuccess("Sent to channel " + resp.Channel)
 	},
 }
 

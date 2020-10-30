@@ -31,3 +31,8 @@ type AttachmentField struct {
 	Title string `json:"title" yaml:"title"`
 	Value string `json:"value" yaml:"value"`
 }
+
+type MessageResponse struct {
+	Channel string	`json:"channel"`
+	Success	bool `json:"success"`
+}

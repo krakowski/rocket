@@ -16,6 +16,9 @@ type ClientOptions struct {
 }
 
 type Client struct {
+
+	CurrentUser	string
+
 	common service
 
 	Auth    *AuthService
@@ -60,5 +63,7 @@ func NewClient(client *http.Client, options ClientOptions) (*Client, error) {
 		return nil, err
 	}
 
+	ret.CurrentUser = options.Credentials.Username
 	return ret, nil
 }
+
